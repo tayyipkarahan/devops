@@ -428,12 +428,24 @@ $ nano inventory_aws_ec2.yml
 ```yml
 plugin: aws_ec2
 regions:
-  - "us-east-1"
+  - us-east-1
 keyed_groups:
   - key: tags.Name
+  - prefix: arch
+    key: architecture
+  - prefix: tag
+    key: tags
+  - prefix: region
+    key: placement.region
+  - prefix: instance_type
+    key: instance_type
 compose:
-  ansible_host: public_ip_address
-
+  ansible_host: public_ip_adress
+  foo: private_ip_address
+  boo: instance_id
+  key: key_name
+filters:
+  instance-state-name: running
 ```
 - see the inventory
 
@@ -466,11 +478,27 @@ $ ansible all -m ping --key-file "~/<pem file>"
   become: true
   vars:
     user: lisa
-    ansible_ssh_private_key_file: "/home/ec2-user/<pem file>"
   tasks:
     - name: create a user {{ user }}
       user:
         name: "{{ user }}"
+    - debug:
+        msg: "private_ip is {{ foo }}"
+
+    - debug:
+        msg: "instance_id is {{ boo }}"
+
+    - debug:
+        msg: "my key pem is {{ key }}"
+
+    - debug:
+        msg: "host is {{ ansible_host }}"
+
+    -  debug:
+        msg: "user name is {{ user | upper }}"
+
+    -  debug:
+        msg: "{{ [1, 2, 3, 4] | min }}"
 ```
 - run the playbook
 
